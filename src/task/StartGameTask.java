@@ -4,7 +4,7 @@ import animation.AnimationRunner;
 import biuoop.GUI;
 import levels.GameFlow;
 import levels.LevelInformation;
-import menu.HighScoreTable;
+import menu.HighScore;
 
 import java.io.File;
 import java.util.List;
@@ -15,9 +15,8 @@ import java.util.List;
 public class StartGameTask implements Task {
     private GUI gui;
     private AnimationRunner animationRunner;
-    private HighScoreTable table;
+    private HighScore table;
     private List<LevelInformation> levels;
-    private int lives;
     private File highScoresFile;
 
     /**
@@ -30,7 +29,7 @@ public class StartGameTask implements Task {
      * @param levels the given levelInformation list.
      * @param highScoresFile the given highScores file.
      */
-    public StartGameTask(GUI gui, AnimationRunner animationRunner, HighScoreTable table, List<LevelInformation> levels,
+    public StartGameTask(GUI gui, AnimationRunner animationRunner, HighScore table, List<LevelInformation> levels,
                          File highScoresFile) {
         this.gui = gui;
         this.animationRunner = animationRunner;
@@ -47,7 +46,7 @@ public class StartGameTask implements Task {
     public Void run() {
         GameFlow game = new GameFlow(this.animationRunner, this.gui.getKeyboardSensor(), this.table);
         game.runLevels(this.levels);
-        table.save(this.highScoresFile);
+        //table.save(this.highScoresFile, si);
         return null;
     }
 }

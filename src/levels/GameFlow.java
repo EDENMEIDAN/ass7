@@ -2,7 +2,7 @@ package levels;
 
 import animation.AnimationRunner;
 import biuoop.KeyboardSensor;
-import menu.HighScoreTable;
+import menu.HighScore;
 import screens.EndScreenLose;
 import screens.EndScreenWin;
 import screens.KeyPressStoppableAnimation;
@@ -22,7 +22,7 @@ import java.util.List;
 public class GameFlow {
     private KeyboardSensor keyboardSensor;
     private Counter score;
-    private HighScoreTable highScoresTable;
+    private HighScore highScoresTable;
     private AnimationRunner animationRunner;
     private boolean youWin;
 
@@ -32,7 +32,7 @@ public class GameFlow {
      * @param ar the animationRunner.
      * @param ks the KeyboardSensor.
      */
-    public GameFlow(AnimationRunner ar, KeyboardSensor ks, HighScoreTable table) {
+    public GameFlow(AnimationRunner ar, KeyboardSensor ks, HighScore table) {
         this.animationRunner = ar;
         this.keyboardSensor = ks;
         this.highScoresTable = table;
@@ -45,7 +45,7 @@ public class GameFlow {
      *
      * @param levels the game levels
      */
-    public void runLevels(List<LevelInformation> levels) {
+    public int runLevels(List<LevelInformation> levels) {
         /*System.out.println("runLevels");
         System.out.println("size:" + levels.size());*/
         for (LevelInformation levelInfo : levels) {
@@ -62,6 +62,7 @@ public class GameFlow {
                 this.youWin = false;
                 this.animationRunner.run(new KeyPressStoppableAnimation(
                         this.keyboardSensor, keyboardSensor.SPACE_KEY, new EndScreenLose(this.score)));
+
                 break;
             }
         }
@@ -69,6 +70,6 @@ public class GameFlow {
             this.animationRunner.run(new KeyPressStoppableAnimation(
                     this.keyboardSensor, keyboardSensor.SPACE_KEY, new EndScreenWin(this.score, this.youWin)));
         }
-        //animationRunner.getGui().close();
+        return score.getValue();
     }
 }

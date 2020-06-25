@@ -1,3 +1,4 @@
+/*
 import task.Task;
 
 public class Example implements Task<Integer>  {
@@ -30,13 +31,15 @@ public class Example implements Task<Integer>  {
         example.foo();
     }
 
-    /**
+    */
+/**
      * this method runs the general task.
      *
      * @return unimplemented option.
-     */
+     *//*
+
     @Override
     public Integer run() { //todo
         return null;
     }
-}
+}*/
