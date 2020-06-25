@@ -1,5 +1,6 @@
 package levels;
 
+import animation.Animation;
 import animation.AnimationRunner;
 import biuoop.KeyboardSensor;
 import menu.HighScore;
@@ -25,6 +26,7 @@ public class GameFlow {
     private HighScore highScoresTable;
     private AnimationRunner animationRunner;
     private boolean youWin;
+    private Animation menuAnimation;
 
     /**
      * Instantiates a new Game flow.
@@ -37,7 +39,8 @@ public class GameFlow {
         this.keyboardSensor = ks;
         this.highScoresTable = table;
         this.score = new Counter(0);
-        this.youWin = true;
+        this.youWin = true;;
+
     }
 
     /**
@@ -48,6 +51,7 @@ public class GameFlow {
     public int runLevels(List<LevelInformation> levels) {
         /*System.out.println("runLevels");
         System.out.println("size:" + levels.size());*/
+        getMenuAnimation().doOneFrame(animationRunner.getGui().getDrawSurface()); // start the menu animation //todo
         for (LevelInformation levelInfo : levels) {
             GameLevel level = new GameLevel(levelInfo, this.keyboardSensor, this.animationRunner, this.score);
             level.initialize();
@@ -71,5 +75,13 @@ public class GameFlow {
                     this.keyboardSensor, keyboardSensor.SPACE_KEY, new EndScreenWin(this.score, this.youWin)));
         }
         return score.getValue();
+    }
+
+    public Animation getMenuAnimation() {
+        return this.menuAnimation;
+    }
+
+    public void setMenuAnimation(Animation newMenuAnimation) {
+        this.menuAnimation = newMenuAnimation;
     }
 }

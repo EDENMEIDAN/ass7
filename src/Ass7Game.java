@@ -1,5 +1,8 @@
+
+import animation.Animation;
 import animation.AnimationRunner;
 import biuoop.GUI;
+import biuoop.KeyboardSensor;
 import levels.GameFlow;
 import levels.Level1DirectHit;
 import levels.Level2WideEasy;
@@ -8,7 +11,9 @@ import levels.Level4FinalFour;
 import levels.LevelInformation;
 import menu.Menu;
 import menu.MenuAnimation;
+import screens.KeyPressStoppableAnimation;
 import task.ExitTask;
+import task.HighScoreAnimation;
 import task.ShowHiScoresTask;
 import task.StartGameTask;
 import task.Task;
@@ -18,6 +23,7 @@ import menu.HighScore;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * this class is the program's main class.
@@ -26,18 +32,20 @@ import java.util.List;
  * @id: 207481177
  * @since 25/06/2020
  */
+
 public class Ass7Game {
     /**
      * this method is the Main method that initializes and runs the whole game!
      *
      * @param args this array stores the user's input. at the moment is empty.
      */
+
     public static void main(String[] args) {
         GUI gui = new GUI("Arkanoid", Const.getScreenWidth(), Const.getScreenHight());
         AnimationRunner runner = new AnimationRunner(gui, 60 / 6);
 
         File highScoresFile = new File("highscores.txt");
-        HighScore table =  new HighScore(highScoresFile);
+        HighScore table = new HighScore(highScoresFile);
         table.loadFromFile();
 
         List<LevelInformation> levelsToPlay = new ArrayList<>();
@@ -65,6 +73,7 @@ public class Ass7Game {
             levelsToPlay.add(level3);
             levelsToPlay.add(level4);
         }
+
         GameFlow gameFlow = new GameFlow(runner, gui.getKeyboardSensor(), table);
 
         int gameScore = gameFlow.runLevels(levelsToPlay);
@@ -72,29 +81,59 @@ public class Ass7Game {
 
         runner.getGui().close();
 
+
         // menu definition --- using generics
-        Menu<Task<Void>> menu = new MenuAnimation<Task<Void>>("Menu Title", gui.getKeyboardSensor(), runner);
 
-        // Press "s" to start a new game.
-        menu.addSelection("s", "Start game",
-                new StartGameTask(gui, runner, table, levelsToPlay, highScoresFile));
-        // Press "h" to see the highest score
-
+        /*Menu<Task<Void>> menu = new MenuAnimation<Task<Void>>("Menu Title", gui.getKeyboardSensor(), runner);
+        menu.addSelection("s", "Start game", new StartGameTask(gui, runner, table, levelsToPlay, highScoresFile));
         menu.addSelection("h", "Hi Score", new ShowHiScoresTask(runner, table));
-        //AnimationRunner runner, Animation highScoresAnimation
-
-        // Press "q" to quit.
-        menu.addSelection("q", "Quit game", new ExitTask(gui));
-
+        menu.addSelection("q", "Quit game", new ExitTask(gui));*/
 
 
         while (true) { //menu loop
+            Menu<Task<Void>> menu = new MenuAnimation<Task<Void>>("Menu Title", gui.getKeyboardSensor(), runner);
+
+            /*gameFlow.setMenuAnimation(menu);*/
+
+            //Menu<Task<Void>> subMenu = new MenuAnimation<Task<Void>>( "Choose difficulty", gui.getKeyboardSensor(), runner);
+            //for (final Map.Entry<String, List<LevelInformation>>  entry : levelsEOH.entrySet()) {
+            Task<Void> startGameTask = new Task<Void>() {
+                //private GameFlow gameFlow = new GameFlow(runner, gui.getKeyboardSensor(), table);
+
+                public Void run() {
+                    gameFlow.runLevels(levelsToPlay); //List<LevelInformation> levels
+                    return null;
+                }
+            };
+            //subMenu.addSelection(entry.getKey(), difficultyNames.get(i), gfHardTask);
+            //i++;
+            //}
+            Task<Void> ShowHiScoresTask = new Task<Void>() {
+                private HighScoreAnimation highScoreAnimation = new HighScoreAnimation();
+
+                public Void run() {
+                    runner.run(new KeyPressStoppableAnimation(gui.getKeyboardSensor(), KeyboardSensor.SPACE_KEY, highScoreAnimation));
+                    return null;
+                }
+            };
+            Task<Void> ExitTask = new Task<Void>() {
+                public Void run() {
+                    gui.close();
+                    return null;
+                }
+            };
+            //menu.addSubMenu("s", "Start", subMenu); //todo
+            menu.addSelection("h", "High Scores", ShowHiScoresTask); //(runner, score)
+            menu.addSelection("q", "Quit", ExitTask);
+
+
             runner.run(menu); // wait for user selection
-            //status = menu.getStatus();
 
             Task<Void> task = menu.getStatus();
+            gameFlow.setMenuAnimation(menu); //!!!!
+
             task.run();
-            //menu.reset();
+            menu.reset();
         }
     }
 }

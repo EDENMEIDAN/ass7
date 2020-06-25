@@ -109,9 +109,9 @@ public class MenuAnimation<T> implements Menu<T> {
                     this.status = this.options.get(i);
                     this.close = true;
                 } else {
-                    this.animationRunner.run(this.subMenus.get(i));
-                    this.status = this.subMenus.get(i).getStatus();
-                    this.subMenus.get(i).reset();
+                    //this.animationRunner.run(this.subMenus.get(i));
+                    //this.status = this.subMenus.get(i).getStatus();
+                    //this.subMenus.get(i).reset();
                     this.close = true;
                     break;
                 }
