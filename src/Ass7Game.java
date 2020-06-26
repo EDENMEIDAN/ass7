@@ -9,12 +9,17 @@ import levels.Level4FinalFour;
 import levels.LevelInformation;
 import menu.Menu;
 import menu.MenuAnimation;
+import parse.LevelSpecificationReader;
 import screens.KeyPressStoppableAnimation;
 import task.HighScoreAnimation;
 import task.Task;
 import settings.Const;
 import menu.HighScore;
+
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +38,7 @@ public class Ass7Game {
      * @param args this array stores the user's input. at the moment is empty.
      */
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException {
         GUI gui = new GUI("Arkanoid", Const.getScreenWidth(), Const.getScreenHight());
         AnimationRunner runner = new AnimationRunner(gui, 60 / 6);
 
@@ -41,13 +46,24 @@ public class Ass7Game {
         HighScore table = new HighScore(highScoresFile);
         table.loadFromFile();
 
-        List<LevelInformation> levelsToPlay = new ArrayList<>();
-        LevelInformation level1 = new Level1DirectHit();
-        LevelInformation level2 = new Level2WideEasy();
-        LevelInformation level3 = new Level3Green3();
-        LevelInformation level4 = new Level4FinalFour();
+        //File setFile = new File("blocks1.txt");
+        FileReader fr = new FileReader("level_definition.txt");
+        BufferedReader br = new BufferedReader(fr);
+        LevelSpecificationReader lsr = new LevelSpecificationReader();
+        List<LevelInformation> listLevelInfo = null;
+        try {
+            listLevelInfo = lsr.fromReader(br);
+        } catch (Exception e) {
+            System.out.println("parse sys error: " + e.getMessage());
+            System.exit(-1); //wrong break program
+        }
+        System.out.println("finished parsing file!!!yayy");
+        for (LevelInformation info : listLevelInfo) {
+            System.out.println(info.levelName()); //להדפיס את כל המידע שיש באינפו TODO
+            //להוסיף משתנה את הסטרינג של הקבצי TXT בלוקס
+        }
 
-        for (int i = 0; i < args.length; i++) {
+/*        for (int i = 0; i < args.length; i++) {
             String cur = args[i];
             System.out.println("arg is: " + cur);
             if (cur.equals("1")) {
@@ -65,12 +81,9 @@ public class Ass7Game {
             levelsToPlay.add(level2);
             levelsToPlay.add(level3);
             levelsToPlay.add(level4);
-        }
-
-        Menu<Task<Void>> menu = new MenuAnimation<Task<Void>>("Menu Title", gui.getKeyboardSensor(), runner);
+        }*/
+        Menu < Task < Void >> menu = new MenuAnimation<Task<Void>>("Menu Title", gui.getKeyboardSensor(), runner);
         GameFlow gameFlow = new GameFlow(runner, gui.getKeyboardSensor(), table, menu);
-
-
 
         // menu definition --- using generics
         /*Menu<Task<Void>> menu = new MenuAnimation<Task<Void>>("Menu Title", gui.getKeyboardSensor(), runner);
@@ -78,12 +91,12 @@ public class Ass7Game {
         menu.addSelection("h", "Hi Score", new ShowHiScoresTask(runner, table));
         menu.addSelection("q", "Quit game", new ExitTask(gui));*/
 
-
+        List<LevelInformation> finalListLevelInfo = listLevelInfo;
         Task<Void> startGameTask = new Task<Void>() {
             //private GameFlow gameFlow = new GameFlow(runner, gui.getKeyboardSensor(), table);
 
             public Void run() {
-                int gameScore = gameFlow.runLevels(levelsToPlay);
+                int gameScore = gameFlow.runLevels(finalListLevelInfo);
                 table.save(gameScore); //save new file with updated score
                 return null;
             }

@@ -3,12 +3,9 @@ package menu;
 import animation.AnimationRunner;
 import biuoop.DrawSurface;
 import biuoop.KeyboardSensor;
-
-
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
-
 
 /**
  * this class represents a menu animation object in the game.
@@ -58,7 +55,6 @@ public class MenuAnimation<T> implements Menu<T> {
         this.keys.add(key);
         this.messages.add(message);
         this.options.add(returnVal);
-        //this.subMenus.add(null);
         this.isOption.add(true);
     }
 
