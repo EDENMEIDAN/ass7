@@ -34,12 +34,13 @@ public class GameFlow {
      * @param ar the animationRunner.
      * @param ks the KeyboardSensor.
      */
-    public GameFlow(AnimationRunner ar, KeyboardSensor ks, HighScore table) {
+    public GameFlow(AnimationRunner ar, KeyboardSensor ks, HighScore table, Animation menuAnimation) {
         this.animationRunner = ar;
         this.keyboardSensor = ks;
         this.highScoresTable = table;
         this.score = new Counter(0);
-        this.youWin = true;;
+        this.youWin = true;
+        this.menuAnimation = menuAnimation;
 
     }
 
@@ -49,9 +50,10 @@ public class GameFlow {
      * @param levels the game levels
      */
     public int runLevels(List<LevelInformation> levels) {
-        /*System.out.println("runLevels");
-        System.out.println("size:" + levels.size());*/
-        getMenuAnimation().doOneFrame(animationRunner.getGui().getDrawSurface()); // start the menu animation //todo
+        System.out.println("runLevels");
+        System.out.println("size:" + levels.size());
+
+
         for (LevelInformation levelInfo : levels) {
             GameLevel level = new GameLevel(levelInfo, this.keyboardSensor, this.animationRunner, this.score);
             level.initialize();
@@ -75,13 +77,5 @@ public class GameFlow {
                     this.keyboardSensor, keyboardSensor.SPACE_KEY, new EndScreenWin(this.score, this.youWin)));
         }
         return score.getValue();
-    }
-
-    public Animation getMenuAnimation() {
-        return this.menuAnimation;
-    }
-
-    public void setMenuAnimation(Animation newMenuAnimation) {
-        this.menuAnimation = newMenuAnimation;
     }
 }

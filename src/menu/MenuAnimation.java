@@ -58,7 +58,7 @@ public class MenuAnimation<T> implements Menu<T> {
         this.keys.add(key);
         this.messages.add(message);
         this.options.add(returnVal);
-        this.subMenus.add(null);
+        //this.subMenus.add(null);
         this.isOption.add(true);
     }
 
