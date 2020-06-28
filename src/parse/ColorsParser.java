@@ -1,86 +1,96 @@
 package parse;
 
+import java.awt.Color;
+
 /**
  * this class
  */
 public class ColorsParser {
     /**
      * this method parse color definition and returns the specified color.
+     *
      * @param s symbl
      * @return the specified color.
-     * @throws Exception
      */
     public static java.awt.Color colorFromString(String s) throws Exception {
-        java.awt.Color c = null;
-        if (s.contains("RGB")) {
+        java.awt.Color returnColor = null;
+        //color(RGB(x,y,z))
+        if (s.startsWith("color(RGB")) {
             int r, g, b;
-            String[] parts1 = s.split("RGB");
-            String s1 = parts1[1].substring(1, parts1[1].length() - 2);
-            String[] parts = s1.split(",");
-            if (parts.length == 3) {
-                r = Integer.parseInt(parts[0]);
-                g = Integer.parseInt(parts[1]);
-                b = Integer.parseInt(parts[2]);
+            String[] parts = s.split("\\(");
+            String xyz = parts[2].substring(0, parts[2].length() - 3); //get xyz
+
+            String[] parts2 = xyz.split(",");
+            if (parts2.length == 3) {
+                r = Integer.parseInt(parts2[0]);
+                g = Integer.parseInt(parts2[1]);
+                b = Integer.parseInt(parts2[2]);
             } else {
                 throw new Exception("Color was written wrong");
             }
             float[] defs = java.awt.Color.RGBtoHSB(r, g, b, null);
-            c = java.awt.Color.getHSBColor(defs[0], defs[1], defs[2]);
+            returnColor = java.awt.Color.getHSBColor(defs[0], defs[1], defs[2]);
         } else {
             // Matches the color according to the string
-            if (s.equals("color(blue)")) {
-                c = java.awt.Color.blue;
-            } else {
-                if (s.equals("color(cyan)")) {
-                    c = java.awt.Color.cyan;
-                } else {
-                    if (s.equals("color(white)")) {
-                        c = java.awt.Color.white;
-                    } else {
-                        if (s.equals("color(black)")) {
-                            c = java.awt.Color.black;
-                        } else {
-                            if (s.equals("color(orange)")) {
-                                c = java.awt.Color.orange;
-                            } else {
-                                if (s.equals("color(green)")) {
-                                    c = java.awt.Color.green;
-                                } else {
-                                    if (s.equals("color(darkGray)")) {
-                                        c = java.awt.Color.darkGray;
-                                    } else {
-                                        if (s.equals("color(gray)")) {
-                                            c = java.awt.Color.gray;
-                                        } else {
-                                            if (s.equals("color(lightGray)")) {
-                                                c = java.awt.Color.lightGray;
-                                            } else {
-                                                if (s.equals("color(magenta)")) {
-                                                    c = java.awt.Color.magenta;
-                                                } else {
-                                                    if (s.equals("color(pink)")) {
-                                                        c = java.awt.Color.pink;
-                                                    } else {
-                                                        if (s.equals("color(yellow)")) {
-                                                            c = java.awt.Color.yellow;
-                                                        } else {
-                                                            if (s.equals("color(red)")) {
-                                                                c = java.awt.Color.red;
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
+            if (s.startsWith("color")) {
+                switch (s) {
+                    case "color(blue)": {
+                        returnColor = java.awt.Color.blue;
+                        break;
                     }
+                    case "color(cyan)": {
+                        returnColor = java.awt.Color.cyan;
+                        break;
+                    }
+                    case "color(white)": {
+                        returnColor = java.awt.Color.white;
+                        break;
+                    }
+                    case "color(black)": {
+                        returnColor = java.awt.Color.black;
+                        break;
+                    }
+                    case "color(orange)": {
+                        returnColor = java.awt.Color.orange;
+                        break;
+                    }
+                    case "color(green)": {
+                        returnColor = java.awt.Color.green;
+                        break;
+                    }
+                    case "color(darkGray)": {
+                        returnColor = java.awt.Color.darkGray;
+                        break;
+                    }
+                    case "color(gray)": {
+                        returnColor = java.awt.Color.gray;
+                        break;
+                    }
+                    case "color(lightGray)": {
+                        returnColor = java.awt.Color.lightGray;
+                        break;
+                    }
+                    case "color(magenta)": {
+                        returnColor = java.awt.Color.magenta;
+                        break;
+                    }
+                    case "color(pink)": {
+                        returnColor = java.awt.Color.pink;
+                        break;
+                    }
+                    case "color(yellow)": {
+                        returnColor = java.awt.Color.yellow;
+                        break;
+                    }
+                    case "color(red)": {
+                        returnColor = java.awt.Color.red;
+                        break;
+                    }
+                    default:
+                        returnColor = java.awt.Color.black;
                 }
             }
-            return c;
         }
-        return c;
+        return returnColor;
     }
 }

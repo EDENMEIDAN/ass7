@@ -36,8 +36,8 @@ public class BlocksDefinitionReader {
     public BlocksFromSymbolsFactory fromReader(java.io.BufferedReader reader)
         throws Exception {
             try {
-                Map<Integer, java.awt.Color> fillC = new HashMap<Integer, Color>();
-                Map<Integer, Image> fillImg = new HashMap<Integer, Image>();
+                Map<Integer, java.awt.Color> fillC = new HashMap<>();
+                Map<Integer, Image> fillImg = new HashMap<>();
                 BlocksFromSymbolsFactory blocksFSF = new BlocksFromSymbolsFactory();
                 String line;
                 double height = 0, width = 0;
@@ -48,23 +48,20 @@ public class BlocksDefinitionReader {
                     if (line.equals("")) {
                         continue;
                     }
-                    if (line.contains("#")) {
+                    else if (line.startsWith("#")) {
                         continue;
                     }
-                    if (line.contains("default")) {
-                        DefinitionsFromText.readFromTextd(line);
+                    else if (line.startsWith("default")) { //default only
+                        DefinitionsFromText.readDefaultFromText(line);
                         this.dwidth = DefinitionsFromText.getWidth();
                         this.dheight = DefinitionsFromText.getHeight();
-                        this.dhitPoints = DefinitionsFromText.getHitPoints();
                         this.dstroke = DefinitionsFromText.getStroke();
                         this.dfillC = DefinitionsFromText.getFillC();
                         this.dfillImg = DefinitionsFromText.getFillImg();
                     }
-                    if (line.contains("bdef symbol")) {
-                        DefinitionsFromText.readFromTextsd(line);
+                    else if (line.startsWith("bdef symbol")) {
                         width = DefinitionsFromText.getWidth();
                         height = DefinitionsFromText.getHeight();
-                        hitPoints = DefinitionsFromText.getHitPoints();
                         stroke = DefinitionsFromText.getStroke();
                         fillC = DefinitionsFromText.getFillC();
                         fillImg = DefinitionsFromText.getFillImg();
@@ -74,9 +71,6 @@ public class BlocksDefinitionReader {
                         }
                         if (height == 0) {
                             height = dheight;
-                        }
-                        if (hitPoints == 0) {
-                            hitPoints = dhitPoints;
                         }
                         if (stroke == null) {
                             stroke = dstroke;
@@ -90,10 +84,15 @@ public class BlocksDefinitionReader {
                         if (fillImg == null && fillC == null) {
                             throw new Exception("No fill was included");
                         }
+
                         if (!fillC.isEmpty()) {
+                            for (Map.Entry<Integer, Color> entry : fillC.entrySet()) {
+                                entry.getValue(i);
+                            }
                             java.awt.Color col = fillC.get(1);
-                            for (int i = 2; i <= hitPoints; i++) {
+
                                 if (!fillC.containsKey(i)) {
+
                                     fillC.put(i, col);
                                 }
                             }
@@ -108,16 +107,16 @@ public class BlocksDefinitionReader {
                             }
                         }
                         if (width != 0 && height != 0 && hitPoints != 0) {
-                            BlockReader blockReader;
+                            BlockCreatorImpl blockReader;
                             if (stroke != null) {
-                                blockReader = new BlockReader(width, height, hitPoints, fillImg, fillC, stroke);
+                                blockReader = new BlockCreatorImpl(width, height, hitPoints, fillImg, fillC, stroke);
                             } else {
-                                blockReader = new BlockReader(width, height, hitPoints, fillImg, fillC);
+                                blockReader = new BlockCreatorImpl(width, height, hitPoints, fillImg, fillC, null);
                             }
                             blocksFSF.getBlockCreator().put(symbol, blockReader);
                             height = 0;
                             width = 0;
-                            hitPoints = 0;
+                            //hitPoints = 0;
                             symbol = null;
                             stroke = null;
                             fillC = new HashMap<Integer, java.awt.Color>();
@@ -126,14 +125,14 @@ public class BlocksDefinitionReader {
                             throw new Exception("Block wasn't defined well");
                         }
                     }
-                    if (line.contains("sdef symbol:")) {
+                    if (line.startsWith("sdef symbol:")) {
                         String[] parts3 = line.split("sdef symbol:");
                         String part4 = parts3[1];
                         String[] parts4 = part4.split(" ");
                         symbol = parts4[0];
                         String[] parts5 = parts4[1].split(":");
                         if (parts5[0].equals("width")) {
-                            blocksFSF.getSpacersWidths().put(symbol, Double.parseDouble(parts5[1]));
+                            blocksFSF.getSpacersWidths().put(symbol, Integer.parseInt(parts5[1]));
                         } else {
                             throw new Exception("Wrong spacer");
                         }
