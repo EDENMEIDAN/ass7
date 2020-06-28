@@ -1,11 +1,8 @@
 package levels;
 
-import geometry.Point;
 import interfaces.Sprite;
-import screens.BackgroundLevel4;
 import settings.Velocity;
 import sprites.Block;
-
 import java.util.ArrayList;
 import java.util.List;
 

@@ -1,6 +1,7 @@
 import animation.AnimationRunner;
 import biuoop.GUI;
 import biuoop.KeyboardSensor;
+import interfaces.Sprite;
 import levels.GameFlow;
 import levels.Level1DirectHit;
 import levels.Level2WideEasy;
@@ -11,6 +12,8 @@ import menu.Menu;
 import menu.MenuAnimation;
 import parse.LevelSpecificationReader;
 import screens.KeyPressStoppableAnimation;
+import settings.Velocity;
+import sprites.Block;
 import task.HighScoreAnimation;
 import task.Task;
 import settings.Const;
@@ -59,10 +62,23 @@ public class Ass7Game {
         }
         System.out.println("finished parsing file!!!yayy");
         for (LevelInformation info : listLevelInfo) {
-            System.out.println(info.levelName()); //להדפיס את כל המידע שיש באינפו TODO
-            //להוסיף משתנה את הסטרינג של הקבצי TXT בלוקס
-        }
+            System.out.println("levelName: " + info.levelName());
+            System.out.println("initialBallVelocities: " + info.initialBallVelocities());
+            System.out.println("getBackground: " + info.getBackground());
+            System.out.println("paddleSpeed: " + info.paddleSpeed());
+            System.out.println("paddleWidth: " + info.paddleWidth());
+            System.out.println("numBlocks: " + info.numberOfBlocksToRemove());
+            System.out.println("blocksList: " + info.blocks());
 
+            //private String blocksDefs; //block_definitions:blocks1.txt
+            System.out.println("blocksDefs: " ); //todo
+            System.out.println("blocksStartX: "); //todo
+            System.out.println("blocksStartY: "); //todo
+            //private int rowHeight;
+            System.out.println("rowHeight: "); //todo
+            //private List<String> blocksRowFormat;
+            System.out.println("blocksRowFormat: "); //todo
+        }
 /*        for (int i = 0; i < args.length; i++) {
             String cur = args[i];
             System.out.println("arg is: " + cur);
@@ -94,7 +110,6 @@ public class Ass7Game {
         List<LevelInformation> finalListLevelInfo = listLevelInfo;
         Task<Void> startGameTask = new Task<Void>() {
             //private GameFlow gameFlow = new GameFlow(runner, gui.getKeyboardSensor(), table);
-
             public Void run() {
                 int gameScore = gameFlow.runLevels(finalListLevelInfo);
                 table.save(gameScore); //save new file with updated score
@@ -115,13 +130,12 @@ public class Ass7Game {
                 return null;
             }
         };
-        menu.addSelection("s", "Start", startGameTask); //todo
+        menu.addSelection("s", "Start", startGameTask);
         menu.addSelection("h", "High Scores", ShowHiScoresTask); //(runner, score)
         menu.addSelection("q", "Quit", ExitTask);
 
         while (true) {
             menu.doOneFrame(runner.getGui().getDrawSurface());
-
             runner.run(menu); // wait for user selection
             Task<Void> task = menu.getStatus();
             task.run();

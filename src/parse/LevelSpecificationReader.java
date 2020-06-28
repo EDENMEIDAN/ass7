@@ -1,20 +1,10 @@
 package parse;
 
-import interfaces.Sprite;
 import levels.LevelInfoImpl;
 import levels.LevelInformation;
 import settings.Velocity;
-import sprites.Block;
 
-import java.awt.Color;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,6 +36,16 @@ public class LevelSpecificationReader {
                     blocksFromSymbolsFactory = new BlocksFromSymbolsFactory(); //TODO parse def file
                 } else if (thisLine.equals("END_BLOCKS")) {
                     inBlocksFlag = false;
+                    assert thisLevelInformation != null;
+                    thisLevelInformation.getBlocksRowFormat(); //all block line info into list str
+                    for (String lineRow : thisLevelInformation.getBlocksRowFormat()) {
+                        for (int i=0; i<lineRow.length(); i++) {
+                            blocksFromSymbolsFactory.getBlock(String.valueOf(lineRow.charAt(i)),
+                                    thisLevelInformation.getBlocksStartX(),//+ thisLevelInformation.get, //TODO SUM OF X
+                                    thisLevelInformation.getBlocksStartY());
+                        }
+                        //TODO SUM OF Y שירדנו שורה
+                    }
                 } else if (inBlocksFlag) {
                     assert thisLevelInformation != null;
                     thisLevelInformation.addRowToBlocksString(thisLine);
@@ -81,11 +81,9 @@ public class LevelSpecificationReader {
                             assert thisLevelInformation != null;
                             thisLevelInformation.setPaddleWidth(Integer.parseInt(myKeyValue[1]));
                             break;
-                        //case "block_definitions": //todo
-                        //thisLevelInformation.set
-                        //block_definitions:blocks1.txt
-                        //block_definitions:blocks2.txt
-                        //break;
+                        case "block_definitions":
+                            thisLevelInformation.setBlocksDefs(myKeyValue[1]);
+                        break;
                         case "blocks_start_x":
                             assert thisLevelInformation != null;
                             thisLevelInformation.setBlocksStartX(Integer.parseInt(myKeyValue[1]));
@@ -124,23 +122,23 @@ public class LevelSpecificationReader {
      * @return a new score table with the updated values according to the data in the file.
      * if the file does not exist, or there is a proble reading it --- an empty table is returned.
      */
-    public void loadFromFile() {
-        try {
-            if (filename.exists()) {
-                Path filePath = Paths.get(filename.getAbsolutePath());
-                Charset charset = StandardCharsets.ISO_8859_1;
-                List<String> lines = Files.readAllLines(filePath, charset); //list of lines in file
-                String line0 = lines.get(0); //our first line
-                String[] part0 = line0.split(" "); //spilt at " "
-                String stringSize = part0[part0.length - 1]; //last split
-                this.size = Integer.parseInt(stringSize);
-            }
-        } catch (FileNotFoundException e) {
-            System.err.println("Unable to find file: " + filename.getName());
-        } catch (IOException e) {
-            System.err.println("IOException" + e.getMessage());
-        } finally {
-            System.out.println("loadFromFile size is - " + this.size);
-        }
-    }
+//    public void loadFromFile() {
+//        try {
+//            if (filename.exists()) {
+//                Path filePath = Paths.get(filename.getAbsolutePath());
+//                Charset charset = StandardCharsets.ISO_8859_1;
+//                List<String> lines = Files.readAllLines(filePath, charset); //list of lines in file
+//                String line0 = lines.get(0); //our first line
+//                String[] part0 = line0.split(" "); //spilt at " "
+//                String stringSize = part0[part0.length - 1]; //last split
+//                this.size = Integer.parseInt(stringSize);
+//            }
+//        } catch (FileNotFoundException e) {
+//            System.err.println("Unable to find file: " + filename.getName());
+//        } catch (IOException e) {
+//            System.err.println("IOException" + e.getMessage());
+//        } finally {
+//            System.out.println("loadFromFile size is - " + this.size);
+//        }
+//    }
 }
