@@ -1,11 +1,16 @@
 package parse;
 
 import sprites.Block;
+
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * this class creates block objects from given symbols.
+ *
+ * @author Eden Meidan
+ * @id: 207481177
+ * @since 28/06/20
  */
 public class BlocksFromSymbolsFactory {
     private Map<String, Integer> spacerWidths;
@@ -15,7 +20,7 @@ public class BlocksFromSymbolsFactory {
      * this method constructs a BlocksFromSymbolsFactory object.
      */
     public BlocksFromSymbolsFactory() {
-        Map<String, Integer> sw = new HashMap<String, Integer>();
+        Map<String, Integer> sw = new HashMap<>();
         Map<String, BlockCreator> bc = new HashMap<String, BlockCreator>();
         this.spacerWidths = sw;
         this.blockCreator = bc;

@@ -1,9 +1,14 @@
 package parse;
 
+import biuoop.DrawSurface;
 import levels.LevelInfoImpl;
 import levels.LevelInformation;
 import settings.Velocity;
+import sprites.Block;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,15 +20,16 @@ import java.util.List;
 public class LevelSpecificationReader {
     private int size;
 
-    public List<LevelInformation> fromReader(java.io.BufferedReader reader) {
+    public List<LevelInformation> fromReader(BufferedReader reader, DrawSurface d, String absolutePath) {
         List<LevelInformation> listRes = new ArrayList<>();
         LevelInfoImpl thisLevelInformation = null;
         BlocksFromSymbolsFactory blocksFromSymbolsFactory = null;
         String thisLine = null;
         boolean inBlocksFlag = false;
+        BufferedReader tempBufferReader = null;
         try {
             while ((thisLine = reader.readLine()) != null) { //while there are lines
-                if  (thisLine.isBlank()) { // checks if line not empty
+                if (thisLine.isBlank()) { // checks if line not empty
                     System.out.println("i got an empty line");
                 } else if (thisLine.charAt(0) == '#') { // checks first char
                     System.out.println("i got a comment");
@@ -32,22 +38,37 @@ public class LevelSpecificationReader {
                 } else if (thisLine.equals("END_LEVEL")) {
                     listRes.add(thisLevelInformation);
                 } else if (thisLine.equals("START_BLOCKS")) {
+                    blocksFromSymbolsFactory = new BlocksFromSymbolsFactory();
                     inBlocksFlag = true;
-                    blocksFromSymbolsFactory = new BlocksFromSymbolsFactory(); //TODO parse def file
+                    assert thisLevelInformation != null;
+
+                    File tempFile = new File(absolutePath + "/" + thisLevelInformation.getBlocksDefs());
+
+                    tempBufferReader = new BufferedReader(new FileReader(tempFile));
+                    blocksFromSymbolsFactory = BlocksDefinitionReader.fromReader(tempBufferReader, d);
+
                 } else if (thisLine.equals("END_BLOCKS")) {
                     inBlocksFlag = false;
                     assert thisLevelInformation != null;
-                    thisLevelInformation.getBlocksRowFormat(); //all block line info into list str
-                    for (String lineRow : thisLevelInformation.getBlocksRowFormat()) {
-                        for (int i=0; i<lineRow.length(); i++) {
-                            blocksFromSymbolsFactory.getBlock(String.valueOf(lineRow.charAt(i)),
-                                    thisLevelInformation.getBlocksStartX(),//+ thisLevelInformation.get, //TODO SUM OF X
-                                    thisLevelInformation.getBlocksStartY());
+                    int sumX = thisLevelInformation.getBlocksStartX();
+                    int sumY = thisLevelInformation.getBlocksStartY();
+                    int maxY = 0;
+                    for (String lineRow : thisLevelInformation.getBlocksRowFormat()) { //all block line info into list str
+                        for (int i = 0; i < lineRow.length(); i++) {
+                            assert blocksFromSymbolsFactory != null;
+                            // create block
+                            Block b = blocksFromSymbolsFactory.getBlock(String.valueOf(lineRow.charAt(i)), sumX, sumY);
+                            thisLevelInformation.getBlocks().add(b); //add block to the block list
+                            //update width counter
+                            sumX += (int) b.getRect().getWidth();
+                            if ((int) b.getRect().getHeight() > maxY) {
+                                maxY = (int) b.getRect().getHeight();
+                            }
                         }
-                        //TODO SUM OF Y שירדנו שורה
+                        // update height counter
+                        sumY += maxY;
                     }
                 } else if (inBlocksFlag) {
-                    assert thisLevelInformation != null;
                     thisLevelInformation.addRowToBlocksString(thisLine);
                 } else {
                     String[] myKeyValue = thisLine.split(":");
@@ -70,7 +91,7 @@ public class LevelSpecificationReader {
                         }
                         case "background": {
                             assert thisLevelInformation != null;
-                            thisLevelInformation.setBackground(null); //TODO
+                            thisLevelInformation.setBackground(null); //TODO add backgraound sprite
                             break;
                         }
                         case "paddle_speed":
@@ -82,8 +103,9 @@ public class LevelSpecificationReader {
                             thisLevelInformation.setPaddleWidth(Integer.parseInt(myKeyValue[1]));
                             break;
                         case "block_definitions":
+                            assert thisLevelInformation != null;
                             thisLevelInformation.setBlocksDefs(myKeyValue[1]);
-                        break;
+                            break;
                         case "blocks_start_x":
                             assert thisLevelInformation != null;
                             thisLevelInformation.setBlocksStartX(Integer.parseInt(myKeyValue[1]));

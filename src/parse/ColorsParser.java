@@ -1,15 +1,17 @@
 package parse;
 
-import java.awt.Color;
-
 /**
- * this class
+ * this class is a ColorsParser object.
+ *
+ * @author Eden Meidan
+ * @id: 207481177
+ * @since 28/06/20
  */
 public class ColorsParser {
     /**
      * this method parse color definition and returns the specified color.
      *
-     * @param s symbl
+     * @param s symbol.
      * @return the specified color.
      */
     public static java.awt.Color colorFromString(String s) throws Exception {

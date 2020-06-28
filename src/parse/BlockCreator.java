@@ -4,7 +4,11 @@ import sprites.Block;
 
 
 /**
- * an interface of a factory-object that is used for creating blocks:
+ * an interface of a factory-object that is used for creating blocks.
+ *
+ * @author Eden Meidan
+ * @id: 207481177
+ * @since 28/06/20
  */
 
 public interface BlockCreator {

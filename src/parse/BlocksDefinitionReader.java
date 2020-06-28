@@ -1,156 +1,207 @@
 package parse;
 
+import biuoop.DrawSurface;
+
+import java.io.File;
 import java.io.IOException;
-import java.awt.Color;
 import java.awt.Image;
 import java.util.HashMap;
 import java.util.Map;
 
+import biuoop.GUI;
+
+import javax.imageio.ImageIO;
+
 /**
  * this class its job is to read a block-definitions file and returning a BlocksFromSymbolsFactory object.
+ *
+ * @author Eden Meidan
+ * @id: 207481177
+ * @since 28/06/20
  */
 public class BlocksDefinitionReader {
-    private static double dwidth;
-    private static double dheight;
-    private static int dhitPoints;
-    private Map<Integer, Color> dfillC;
-    private Map<Integer, Image> dfillImg;
+    private GUI gui;
+    private double dwidth;
+    private double dheight;
     private java.awt.Color dstroke;
-    private Map<String, Integer> spacerWidths; //todo
-    private Map<String, BlockCreator> blockCreators; //todo
+    private Map<String, Integer> spacerWidths;
+    private Map<String, BlockCreator> blockCreators;
 
     /**
-     * Constructor.
+     * Constructors a BlocksDefinitionReader object.
      */
+
     public BlocksDefinitionReader() {
-        Map<Integer, java.awt.Color> cf = new HashMap<Integer, java.awt.Color>();
-        Map<Integer, Image> fi = new HashMap<Integer, Image>();
-        this.dfillC = cf;
-        this.dfillImg = fi;
         this.dheight = 0;
-        this.dhitPoints = 0;
         this.dwidth = 0;
         this.dstroke = null;
+        this.spacerWidths = new HashMap<>();
+        this.blockCreators = new HashMap<>();
     }
 
-    public BlocksFromSymbolsFactory fromReader(java.io.BufferedReader reader)
-        throws Exception {
-            try {
-                Map<Integer, java.awt.Color> fillC = new HashMap<>();
-                Map<Integer, Image> fillImg = new HashMap<>();
-                BlocksFromSymbolsFactory blocksFSF = new BlocksFromSymbolsFactory();
-                String line;
-                double height = 0, width = 0;
-                int hitPoints = 0;
-                String symbol = null;
-                java.awt.Color stroke = null;
-                while ((line = reader.readLine()) != null) {
-                    if (line.equals("")) {
-                        continue;
-                    }
-                    else if (line.startsWith("#")) {
-                        continue;
-                    }
-                    else if (line.startsWith("default")) { //default only
-                        DefinitionsFromText.readDefaultFromText(line);
-                        this.dwidth = DefinitionsFromText.getWidth();
-                        this.dheight = DefinitionsFromText.getHeight();
-                        this.dstroke = DefinitionsFromText.getStroke();
-                        this.dfillC = DefinitionsFromText.getFillC();
-                        this.dfillImg = DefinitionsFromText.getFillImg();
-                    }
-                    else if (line.startsWith("bdef symbol")) {
-                        width = DefinitionsFromText.getWidth();
-                        height = DefinitionsFromText.getHeight();
-                        stroke = DefinitionsFromText.getStroke();
-                        fillC = DefinitionsFromText.getFillC();
-                        fillImg = DefinitionsFromText.getFillImg();
-                        symbol = DefinitionsFromText.getSymbol();
-                        if (width == 0) {
-                            width = dwidth;
-                        }
-                        if (height == 0) {
-                            height = dheight;
-                        }
-                        if (stroke == null) {
-                            stroke = dstroke;
-                        }
-                        if (fillC.isEmpty()) {
-                            fillC = this.dfillC;
-                        }
-                        if (fillImg.isEmpty()) {
-                            fillImg = this.dfillImg;
-                        }
-                        if (fillImg == null && fillC == null) {
-                            throw new Exception("No fill was included");
-                        }
+    /**
+     * this method reads the txt file and creates a BlocksFromSymbolsFactory.
+     *
+     * @param reader the txt BufferedReader.
+     * @return a BlocksFromSymbolsFactory.
+     * @throws Exception if
+     */
+    public static BlocksFromSymbolsFactory fromReader(java.io.BufferedReader reader, DrawSurface d) throws Exception {
+        BlocksFromSymbolsFactory blocksFSF = new BlocksFromSymbolsFactory();
+        try {
+            String line;
+            DefinitionsFromText defText = null;
+            while ((line = reader.readLine()) != null) {
+                if (line.equals("")) {
+                    continue;
+                } else if (line.startsWith("#")) {
+                    continue;
+                } else if (line.startsWith("default")) { //default only
+                    defText = new DefinitionsFromText();
+                    defText.readDefaultFromText(line);
+                } else if (line.startsWith("bdef")) {
 
-                        if (!fillC.isEmpty()) {
-                            for (Map.Entry<Integer, Color> entry : fillC.entrySet()) {
-                                entry.getValue(i);
+                    int width = 0, height = 0;
+                    String symbol = "", fillImg = "";
+                    java.awt.Color stroke = null, fillC = null;
+
+                    String fields = line.substring("bdef ".length()); //get rid of default
+                    String[] parts = fields.split(" ");
+                    for (String fieldValue : parts) {
+                        String[] keyValue = fieldValue.split(":");
+                        switch (keyValue[0]) {
+                            case "symbol": {
+                                symbol = keyValue[1];
+                                break;
                             }
-                            java.awt.Color col = fillC.get(1);
-
-                                if (!fillC.containsKey(i)) {
-
-                                    fillC.put(i, col);
+                            case "fill": {
+                                if (keyValue[1].startsWith("image")) {
+                                    String images = keyValue[1].substring("image(".length(), keyValue[1].length() - 2);
+                                    fillImg = images;
+                                } else {
+                                    String color = keyValue[1].substring("color(".length(), keyValue[1].length() - 2);
+                                    fillC = ColorsParser.colorFromString(color);
                                 }
+                                break;
+                            }
+                            case "height": {
+                                height = Integer.parseInt(keyValue[1]);
+                                break;
+                            }
+                            case "width": {
+                                width = Integer.parseInt(keyValue[1]);
+                                break;
+                            }
+                            case "stroke": {
+                                String color = keyValue[1].substring("stroke(".length(), keyValue[1].length() - 2);
+                                stroke = ColorsParser.colorFromString(color);
+                                break;
                             }
                         }
-                        assert fillImg != null;
-                        if (!fillImg.isEmpty()) {
-                            Image im = fillImg.get(1);
-                            for (int i = 2; i <= hitPoints; i++) {
-                                if (!fillImg.containsKey(i)) {
-                                    fillImg.put(i, im);
-                                }
-                            }
-                        }
-                        if (width != 0 && height != 0 && hitPoints != 0) {
-                            BlockCreatorImpl blockReader;
-                            if (stroke != null) {
-                                blockReader = new BlockCreatorImpl(width, height, hitPoints, fillImg, fillC, stroke);
-                            } else {
-                                blockReader = new BlockCreatorImpl(width, height, hitPoints, fillImg, fillC, null);
-                            }
-                            blocksFSF.getBlockCreator().put(symbol, blockReader);
-                            height = 0;
-                            width = 0;
-                            //hitPoints = 0;
-                            symbol = null;
-                            stroke = null;
-                            fillC = new HashMap<Integer, java.awt.Color>();
-                            fillImg = new HashMap<Integer, Image>();
+                    }
+                    //bdef symbol:z fill:image(block_images/zebra.jpg)
+                    //bdef symbol:l fill:image(block_images/leopard.jpg)
+                    if (width == 0) {
+                        assert defText != null;
+                        if (defText.getWidth() != 0) {
+                            width = defText.getWidth();
                         } else {
-                            throw new Exception("Block wasn't defined well");
+                            throw new ParseException("no width given");
                         }
                     }
-                    if (line.startsWith("sdef symbol:")) {
-                        String[] parts3 = line.split("sdef symbol:");
-                        String part4 = parts3[1];
-                        String[] parts4 = part4.split(" ");
-                        symbol = parts4[0];
-                        String[] parts5 = parts4[1].split(":");
-                        if (parts5[0].equals("width")) {
-                            blocksFSF.getSpacersWidths().put(symbol, Integer.parseInt(parts5[1]));
+                    if (height == 0) {
+                        assert defText != null;
+                        if (defText.getHeight() != 0) {
+                            height = defText.getHeight();
                         } else {
-                            throw new Exception("Wrong spacer");
+                            throw new ParseException("no height given");
                         }
                     }
-                }
-                return blocksFSF;
-            } catch (IOException e) {
-                System.out.println("Something went wrong while reading");
-            } finally {
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (IOException e) {
-                        System.out.println("Failed closing the file!");
+                    if (symbol.equals("")) {
+                        throw new ParseException("no symbol given");
                     }
+                    if (fillImg.equals("") && fillC == null) {
+                        throw new ParseException("no fill given");
+                    }
+                    if (stroke == null) {
+                        assert defText != null;
+                        if (defText.getStroke() != null) {
+                            stroke = defText.getStroke();
+                        } else {
+                            throw new ParseException("no stroke given");
+                        }
+                    }
+                    Image imgMy = null;
+                    if (!fillImg.equals("")) {
+                        imgMy = ImageIO.read(new File(fillImg));
+                    }
+                    BlockCreator creator = new BlockCreatorImpl(width, height, imgMy, fillC, stroke, d);
+                    blocksFSF.getBlockCreator().put(symbol, creator);
+                } else if (line.startsWith("sdef")) {
+                    //sdef symbol:- width:30
+                    int width = 0, height = 0;
+                    String symbol = "";
+                    String fields = line.substring("sdef ".length()); //get rid of default
+                    String[] parts = fields.split(" ");
+                    //getting fields from line
+                    for (String fieldValue : parts) {
+                        String[] keyValue = fieldValue.split(":");
+                        switch (keyValue[0]) {
+                            case "symbol": {
+                                symbol = keyValue[1];
+                                break;
+                            }
+                            case "height": {
+                                height = Integer.parseInt(keyValue[1]);
+                                break;
+                            }
+                            case "width": {
+                                width = Integer.parseInt(keyValue[1]);
+                                break;
+                            }
+                        }
+                    }
+                    //filling empty fields with default
+                    if (width == 0) {
+                        assert defText != null;
+                        if (defText.getWidth() != 0) {
+                            width = defText.getWidth();
+                        } else {
+                            throw new ParseException("no width given sdf");
+                        }
+                    }
+                    if (height == 0) {
+                        assert defText != null;
+                        if (defText.getHeight() != 0) {
+                            height = defText.getHeight();
+                        } else {
+                            throw new ParseException("no height given sdf");
+                        }
+                    }
+                    if (symbol.equals("")) {
+                        throw new ParseException("no symbol given sdf");
+                    }
+                    blocksFSF.getSpacersWidths().put(symbol, width); // todo check height if needed
+                } else {
+                    throw new ParseException("what kind o line is this");
                 }
             }
-            return null;
+        } catch (IOException e) {
+            System.out.println("Something went wrong while reading");
+            throw e;
+        } catch (Exception e) {
+            System.out.println("other exception" + e.getMessage());
+            throw e;
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    System.out.println("Failed closing the file!");
+                    throw e;
+                }
+            }
         }
+        return blocksFSF;
     }
 }

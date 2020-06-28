@@ -12,6 +12,7 @@ import settings.GameEnvironment;
 import settings.Velocity;
 
 import java.awt.Color;
+import java.awt.Image;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +28,8 @@ public class Block implements Collidable, Sprite, HitNotifier {
     private Color color;
     private int hits;
     private List<HitListener> hitListeners;
+    private Image fillImg;
+    private Color stroke;
 
     /**
      * constructs a sprites.Block from a geometry.Rectangle and a color.
@@ -120,7 +123,7 @@ public class Block implements Collidable, Sprite, HitNotifier {
                 (int) Math.round(this.rect.getUpperLeft().getY()),
                 (int) Math.round(this.rect.getWidth()),
                 (int) Math.round(this.rect.getHeight()));
-        d.setColor(Color.BLACK);
+        d.setColor(this.stroke); //stroke
         d.drawRectangle(
                 (int) Math.round(this.rect.getUpperLeft().getX()),
                 (int) Math.round(this.rect.getUpperLeft().getY()),
@@ -170,6 +173,11 @@ public class Block implements Collidable, Sprite, HitNotifier {
     public void setColor(Color col) {
         this.color = col;
     }
+
+    public void setStroke(Color col) {
+        this.stroke = col;
+    }
+
 
     /**
      * this method adds a block to a our current game.
@@ -299,5 +307,11 @@ public class Block implements Collidable, Sprite, HitNotifier {
             newVelocity.setDy(newDy);
         }
         return newVelocity;
+    }
+
+    //// Draw the image on a DrawSurface
+    public void setImg(DrawSurface d, Image fillImg, int x, int y) {
+        d.drawImage(x, y, fillImg);
+        //gui.show(d); //todo check if needed
     }
 }

@@ -50,12 +50,14 @@ public class Ass7Game {
         table.loadFromFile();
 
         //File setFile = new File("blocks1.txt");
-        FileReader fr = new FileReader("level_definition.txt");
+        File levelDefFile = new File("resources/level_definition.txt");
+        FileReader fr = new FileReader(levelDefFile);
+
         BufferedReader br = new BufferedReader(fr);
         LevelSpecificationReader lsr = new LevelSpecificationReader();
         List<LevelInformation> listLevelInfo = null;
         try {
-            listLevelInfo = lsr.fromReader(br);
+            listLevelInfo = lsr.fromReader(br, gui.getDrawSurface(), levelDefFile.getAbsoluteFile().getParent());
         } catch (Exception e) {
             System.out.println("parse sys error: " + e.getMessage());
             System.exit(-1); //wrong break program
@@ -71,13 +73,13 @@ public class Ass7Game {
             System.out.println("blocksList: " + info.blocks());
 
             //private String blocksDefs; //block_definitions:blocks1.txt
-            System.out.println("blocksDefs: " ); //todo
-            System.out.println("blocksStartX: "); //todo
-            System.out.println("blocksStartY: "); //todo
+//            System.out.println("blocksDefs: " + info.b); //todo
+//            System.out.println("blocksStartX: "); //todo
+//            System.out.println("blocksStartY: "); //todo
             //private int rowHeight;
-            System.out.println("rowHeight: "); //todo
+//            System.out.println("rowHeight: "); //todo
             //private List<String> blocksRowFormat;
-            System.out.println("blocksRowFormat: "); //todo
+//            System.out.println("blocksRowFormat: "); //todo
         }
 /*        for (int i = 0; i < args.length; i++) {
             String cur = args[i];

@@ -2,30 +2,21 @@ package parse;
 
 import java.awt.Color;
 import java.awt.Image;
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.imageio.ImageIO;
 
 /**
- *
+ * this class represents the DefinitionsFromText object.
  */
 public class DefinitionsFromText {
     private int width;
     private int height;
     private java.awt.Color stroke;
-    private java.awt.Color fillC;
-    private  Image fillImg;
-    //private static String symbol;
+   /* private java.awt.Color fillC;
+    private Image fillImg;*/
 
-
-    public DefinitionsFromText(int width, int height, Color stroke, Color fillC, Image fillImg) {
-        this.width = width;
-        this.height = height;
-        this.stroke = stroke;
-        this.fillC = fillC;
-        this.fillImg = fillImg;
+    public DefinitionsFromText() { //Color fillC, Image fillImg
+        this.width = 0;
+        this.height = 0;
+        this.stroke = null;
     }
 
     /**
@@ -35,59 +26,46 @@ public class DefinitionsFromText {
      * @throws Exception if color is nor identified.
      */
     public void readDefaultFromText(String line) throws Exception {
-        //example default height:25 width:50 stroke:color(black)
+        //example default height:25 width:50 stroke:color(black) //TODO START HERE
+        line = line.substring("default ".length()); //get rid of default
         String[] parts = line.split(" ");
-        /*for ()
-        String part1 = parts[1];*/
-        for (String retval : parts.split(" ")) {
-            String[] parts2 = retval.split(":");
-            if (parts2[0].equals("width")) {
-                width = Integer.parseInt(parts2[1]);
-            }
-            if (parts2[0].equals("height")) {
-                height = Integer.parseInt(parts2[1]);
-            }
-            // Matches the color according to the string
-            if (parts2[0].equals("stroke")) {
-                stroke = ColorsParser.colorFromString(parts2[1]);
-            }
-            if (parts2[0].contains("fill")) {
-                int fillKey;
-                if (parts2[0].contains("-")) {
-                    String[] fillB = parts2[0].split("-");
-                    fillKey = Integer.parseInt(fillB[1]);
-                } else {
-                    fillKey = 1;
+
+        for (String fieldValue : parts) {
+            String[] keyValue = fieldValue.split(":");
+            switch (keyValue[0]) {
+                case "width": {
+                    width = Integer.parseInt(keyValue[1]);
+                    break;
                 }
-                if (parts2[1].contains("image")) {
-                    String[] str = parts2[1].split("\\(");
-                    String[] str2 = str[1].split("\\)");
-                    InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream(str2[0]);
-                    Image img = ImageIO.read(is);
-                    fillImg.put(fillKey, img);
-                } else {
-                    fillC.put(fillKey, ColorsParser.colorFromString(parts2[1]));
+                case "height": {
+                    height = Integer.parseInt(keyValue[1]);
+                    break;
                 }
+                case "stroke": {
+                    stroke = ColorsParser.colorFromString(keyValue[1]);
+                    break;
+                }
+               /* case "fill" : {  //todo check about fill in default
+                    if (keyValue[1].startsWith("image")) {
+                        String[] str = keyValue[1].split("\\(");
+                        String[] str2 = str[1].split("\\)");
+                        InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream(str2[0]);
+                        Image img = ImageIO.read(is);
+                        fillImg.put(fillKey, img);
+                    } else {
+                        fillC.put(fillKey, ColorsParser.colorFromString(keyValue[1]));
+                    }
+                }*/
             }
         }
     }
-
-    /**
-     * Returns the levels symbol.
-     *
-     * @return the class's symbol.
-     */
-    public static String getSymbol() {
-        return symbol;
-    }
-
 
     /**
      * Returns the width.
      *
      * @return the class's hit width.
      */
-    public static int getWidth() {
+    public int getWidth() {
         return width;
     }
 
@@ -96,7 +74,7 @@ public class DefinitionsFromText {
      *
      * @return the class's height.
      */
-    public static int getHeight() {
+    public int getHeight() {
         return height;
     }
 
@@ -105,25 +83,7 @@ public class DefinitionsFromText {
      *
      * @return the class's stroke color.
      */
-    public static java.awt.Color getStroke() {
+    public java.awt.Color getStroke() {
         return stroke;
-    }
-
-    /**
-     * Returns the fillC map.
-     *
-     * @return the class's fillC map
-     */
-    public static Map<Integer, java.awt.Color> getFillC() {
-        return fillC;
-    }
-
-    /**
-     * Returns the fillImg map.
-     *
-     * @return the class's fillImg map.
-     */
-    public static Map<Integer, Image> getFillImg() {
-        return fillImg;
     }
 }
