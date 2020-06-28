@@ -40,7 +40,6 @@ public class Ass7Game {
      *
      * @param args this array stores the user's input. at the moment is empty.
      */
-
     public static void main(String[] args) throws FileNotFoundException {
         GUI gui = new GUI("Arkanoid", Const.getScreenWidth(), Const.getScreenHight());
         AnimationRunner runner = new AnimationRunner(gui, 60 / 6);

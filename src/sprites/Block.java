@@ -123,7 +123,7 @@ public class Block implements Collidable, Sprite, HitNotifier {
                 (int) Math.round(this.rect.getUpperLeft().getY()),
                 (int) Math.round(this.rect.getWidth()),
                 (int) Math.round(this.rect.getHeight()));
-        d.setColor(this.stroke); //stroke
+        d.setColor(this.stroke);
         d.drawRectangle(
                 (int) Math.round(this.rect.getUpperLeft().getX()),
                 (int) Math.round(this.rect.getUpperLeft().getY()),

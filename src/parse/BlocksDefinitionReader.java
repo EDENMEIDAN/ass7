@@ -2,6 +2,7 @@ package parse;
 
 import biuoop.DrawSurface;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.awt.Image;
@@ -43,21 +44,21 @@ public class BlocksDefinitionReader {
      * this method reads the txt file and creates a BlocksFromSymbolsFactory.
      *
      * @param reader the txt BufferedReader.
+     * @param absolutePath
      * @return a BlocksFromSymbolsFactory.
      * @throws Exception if
      */
-    public static BlocksFromSymbolsFactory fromReader(java.io.BufferedReader reader, DrawSurface d) throws Exception {
+    public static BlocksFromSymbolsFactory fromReader(BufferedReader reader, DrawSurface d, String absolutePath) throws Exception {
         BlocksFromSymbolsFactory blocksFSF = new BlocksFromSymbolsFactory();
         try {
             String line;
-            DefinitionsFromText defText = null;
+            DefinitionsFromText defText = new DefinitionsFromText();
             while ((line = reader.readLine()) != null) {
                 if (line.equals("")) {
                     continue;
                 } else if (line.startsWith("#")) {
                     continue;
                 } else if (line.startsWith("default")) { //default only
-                    defText = new DefinitionsFromText();
                     defText.readDefaultFromText(line);
                 } else if (line.startsWith("bdef")) {
 
@@ -75,12 +76,18 @@ public class BlocksDefinitionReader {
                                 break;
                             }
                             case "fill": {
+                                System.out.println("full - line: " + line);
                                 if (keyValue[1].startsWith("image")) {
-                                    String images = keyValue[1].substring("image(".length(), keyValue[1].length() - 2);
+                                    String images = keyValue[1].substring("image(".length(), keyValue[1].length() - 1);
                                     fillImg = images;
+                                    System.out.println("fill imge");
                                 } else {
-                                    String color = keyValue[1].substring("color(".length(), keyValue[1].length() - 2);
+                                    //String color = keyValue[1].substring("color(".length(), keyValue[1].length() - 1);
+                                    String color = keyValue[1];
+                                    System.out.println("color: " + color);
                                     fillC = ColorsParser.colorFromString(color);
+                                    System.out.println("fill color " + fillC);
+
                                 }
                                 break;
                             }
@@ -102,7 +109,6 @@ public class BlocksDefinitionReader {
                     //bdef symbol:z fill:image(block_images/zebra.jpg)
                     //bdef symbol:l fill:image(block_images/leopard.jpg)
                     if (width == 0) {
-                        assert defText != null;
                         if (defText.getWidth() != 0) {
                             width = defText.getWidth();
                         } else {
@@ -110,7 +116,6 @@ public class BlocksDefinitionReader {
                         }
                     }
                     if (height == 0) {
-                        assert defText != null;
                         if (defText.getHeight() != 0) {
                             height = defText.getHeight();
                         } else {
@@ -124,16 +129,16 @@ public class BlocksDefinitionReader {
                         throw new ParseException("no fill given");
                     }
                     if (stroke == null) {
-                        assert defText != null;
+                        System.out.println("stroke = null");
                         if (defText.getStroke() != null) {
                             stroke = defText.getStroke();
-                        } else {
-                            throw new ParseException("no stroke given");
+
                         }
                     }
                     Image imgMy = null;
                     if (!fillImg.equals("")) {
-                        imgMy = ImageIO.read(new File(fillImg));
+                        File tempFile = new File(absolutePath + "/" + fillImg);
+                        imgMy = ImageIO.read(tempFile);
                     }
                     BlockCreator creator = new BlockCreatorImpl(width, height, imgMy, fillC, stroke, d);
                     blocksFSF.getBlockCreator().put(symbol, creator);
@@ -163,7 +168,6 @@ public class BlocksDefinitionReader {
                     }
                     //filling empty fields with default
                     if (width == 0) {
-                        assert defText != null;
                         if (defText.getWidth() != 0) {
                             width = defText.getWidth();
                         } else {
@@ -171,11 +175,8 @@ public class BlocksDefinitionReader {
                         }
                     }
                     if (height == 0) {
-                        assert defText != null;
                         if (defText.getHeight() != 0) {
                             height = defText.getHeight();
-                        } else {
-                            throw new ParseException("no height given sdf");
                         }
                     }
                     if (symbol.equals("")) {

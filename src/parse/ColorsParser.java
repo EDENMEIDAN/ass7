@@ -16,11 +16,13 @@ public class ColorsParser {
      */
     public static java.awt.Color colorFromString(String s) throws Exception {
         java.awt.Color returnColor = null;
+        System.out.println("color from string: " + s);
         //color(RGB(x,y,z))
         if (s.startsWith("color(RGB")) {
             int r, g, b;
             String[] parts = s.split("\\(");
-            String xyz = parts[2].substring(0, parts[2].length() - 3); //get xyz
+            String xyz = parts[2].substring(0, parts[2].length() - 2); //get xyz
+            System.out.println("xyz" + xyz);
 
             String[] parts2 = xyz.split(",");
             if (parts2.length == 3) {

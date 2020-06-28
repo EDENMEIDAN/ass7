@@ -45,28 +45,44 @@ public class LevelSpecificationReader {
                     File tempFile = new File(absolutePath + "/" + thisLevelInformation.getBlocksDefs());
 
                     tempBufferReader = new BufferedReader(new FileReader(tempFile));
-                    blocksFromSymbolsFactory = BlocksDefinitionReader.fromReader(tempBufferReader, d);
+                    blocksFromSymbolsFactory = BlocksDefinitionReader.fromReader(tempBufferReader, d, absolutePath);
 
                 } else if (thisLine.equals("END_BLOCKS")) {
                     inBlocksFlag = false;
                     assert thisLevelInformation != null;
                     int sumX = thisLevelInformation.getBlocksStartX();
                     int sumY = thisLevelInformation.getBlocksStartY();
-                    int maxY = 0;
                     for (String lineRow : thisLevelInformation.getBlocksRowFormat()) { //all block line info into list str
+                        int maxY = 0; //reset in each row
                         for (int i = 0; i < lineRow.length(); i++) {
                             assert blocksFromSymbolsFactory != null;
                             // create block
-                            Block b = blocksFromSymbolsFactory.getBlock(String.valueOf(lineRow.charAt(i)), sumX, sumY);
-                            thisLevelInformation.getBlocks().add(b); //add block to the block list
-                            //update width counter
-                            sumX += (int) b.getRect().getWidth();
-                            if ((int) b.getRect().getHeight() > maxY) {
-                                maxY = (int) b.getRect().getHeight();
+                            System.out.println("sumx: " + sumX + " sum y: " + sumY);
+                            String currentChar = String.valueOf(lineRow.charAt(i));
+                            Block b = null;
+                            if (blocksFromSymbolsFactory.isBlockSymbol(currentChar)) {
+                                b = blocksFromSymbolsFactory.getBlock(currentChar, sumX, sumY);
+                                thisLevelInformation.getBlocks().add(b); //add block to the block list
+
+                                System.out.println("created block " + currentChar);
+                                //update counters
+                                sumX += (int) b.getRect().getWidth();
+                                if ((int) b.getRect().getHeight() > maxY) {
+                                    maxY = (int) b.getRect().getHeight();
+                                }
+                            } else if (blocksFromSymbolsFactory.isSpaceSymbol(currentChar)) {
+                                int spacer = blocksFromSymbolsFactory.getSpaceWidth(currentChar);
+                                System.out.println("created spacer " + currentChar);
+                                sumX += spacer;
+                                if (maxY < thisLevelInformation.getRowHeight()) {
+                                    maxY = thisLevelInformation.getRowHeight();
+                                }
+                            } else {
+                                throw new ParseException("couldn't find currentChar " + currentChar);
                             }
                         }
-                        // update height counter
-                        sumY += maxY;
+
+                        sumY += maxY;// update height counter
                     }
                 } else if (inBlocksFlag) {
                     thisLevelInformation.addRowToBlocksString(thisLine);
