@@ -40,9 +40,10 @@ public class Ass7Game {
      *
      * @param args this array stores the user's input. at the moment is empty.
      */
+
     public static void main(String[] args) throws FileNotFoundException {
         GUI gui = new GUI("Arkanoid", Const.getScreenWidth(), Const.getScreenHight());
-        AnimationRunner runner = new AnimationRunner(gui, 60 / 6);
+        AnimationRunner runner = new AnimationRunner(gui, 60 / 1);
 
         File highScoresFile = new File("highscores.txt");
         HighScore table = new HighScore(highScoresFile);
@@ -70,7 +71,6 @@ public class Ass7Game {
             System.out.println("paddleWidth: " + info.paddleWidth());
             System.out.println("numBlocks: " + info.numberOfBlocksToRemove());
             System.out.println("blocksList: " + info.blocks());
-
             //private String blocksDefs; //block_definitions:blocks1.txt
 //            System.out.println("blocksDefs: " + info.b); //todo
 //            System.out.println("blocksStartX: "); //todo
@@ -101,16 +101,14 @@ public class Ass7Game {
         }*/
         Menu < Task < Void >> menu = new MenuAnimation<Task<Void>>("Menu Title", gui.getKeyboardSensor(), runner);
         GameFlow gameFlow = new GameFlow(runner, gui.getKeyboardSensor(), table, menu);
-
-        // menu definition --- using generics
-        /*Menu<Task<Void>> menu = new MenuAnimation<Task<Void>>("Menu Title", gui.getKeyboardSensor(), runner);
+        /* menu definition --- using generics
+        Menu<Task<Void>> menu = new MenuAnimation<Task<Void>>("Menu Title", gui.getKeyboardSensor(), runner);
         menu.addSelection("s", "Start game", new StartGameTask(gui, runner, table, levelsToPlay, highScoresFile));
         menu.addSelection("h", "Hi Score", new ShowHiScoresTask(runner, table));
         menu.addSelection("q", "Quit game", new ExitTask(gui));*/
-
         List<LevelInformation> finalListLevelInfo = listLevelInfo;
         Task<Void> startGameTask = new Task<Void>() {
-            //private GameFlow gameFlow = new GameFlow(runner, gui.getKeyboardSensor(), table);
+           @Override
             public Void run() {
                 int gameScore = gameFlow.runLevels(finalListLevelInfo);
                 table.save(gameScore); //save new file with updated score
@@ -119,13 +117,14 @@ public class Ass7Game {
         };
         Task<Void> ShowHiScoresTask = new Task<Void>() {
             private HighScoreAnimation highScoreAnimation = new HighScoreAnimation();
-
+            @Override
             public Void run() {
                 runner.run(new KeyPressStoppableAnimation(gui.getKeyboardSensor(), KeyboardSensor.SPACE_KEY, highScoreAnimation));
                 return null;
             }
         };
         Task<Void> ExitTask = new Task<Void>() {
+            @Override
             public Void run() {
                 gui.close();
                 return null;

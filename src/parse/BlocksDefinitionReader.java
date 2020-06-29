@@ -31,7 +31,6 @@ public class BlocksDefinitionReader {
     /**
      * Constructors a BlocksDefinitionReader object.
      */
-
     public BlocksDefinitionReader() {
         this.dheight = 0;
         this.dwidth = 0;
@@ -49,7 +48,7 @@ public class BlocksDefinitionReader {
      * @throws Exception if
      */
     public static BlocksFromSymbolsFactory fromReader(BufferedReader reader, DrawSurface d, String absolutePath) throws Exception {
-        BlocksFromSymbolsFactory blocksFSF = new BlocksFromSymbolsFactory();
+        BlocksFromSymbolsFactory blocksFSF = new BlocksFromSymbolsFactory(); //spacerWidths, blockCreators
         try {
             String line;
             DefinitionsFromText defText = new DefinitionsFromText();
@@ -87,7 +86,6 @@ public class BlocksDefinitionReader {
                                     System.out.println("color: " + color);
                                     fillC = ColorsParser.colorFromString(color);
                                     System.out.println("fill color " + fillC);
-
                                 }
                                 break;
                             }

@@ -118,17 +118,25 @@ public class Block implements Collidable, Sprite, HitNotifier {
      * @param d the draw surface on the screen to draw on.
      */
     public void drawOn(DrawSurface d) {
-        d.setColor(this.color);
-        d.fillRectangle((int) Math.round(this.rect.getUpperLeft().getX()),
-                (int) Math.round(this.rect.getUpperLeft().getY()),
-                (int) Math.round(this.rect.getWidth()),
-                (int) Math.round(this.rect.getHeight()));
-        d.setColor(this.stroke);
-        d.drawRectangle(
-                (int) Math.round(this.rect.getUpperLeft().getX()),
-                (int) Math.round(this.rect.getUpperLeft().getY()),
-                (int) Math.round(this.rect.getWidth()),
-                (int) Math.round(this.rect.getHeight()));
+        System.out.println("color " + this.color);
+        System.out.println("stroke " + this.stroke);
+        if (this.color != null) {
+            d.setColor(this.color);
+            d.fillRectangle((int) Math.round(this.rect.getUpperLeft().getX()),
+                    (int) Math.round(this.rect.getUpperLeft().getY()),
+                    (int) Math.round(this.rect.getWidth()),
+                    (int) Math.round(this.rect.getHeight()));
+        } else if (this.fillImg != null) {
+            d.drawImage((int) Math.round(rect.getUpperLeft().getX()), (int) Math.round(rect.getUpperLeft().getY()), fillImg);
+        }
+        if (stroke != null) {
+            d.setColor(this.stroke);
+            d.drawRectangle(
+                    (int) Math.round(this.rect.getUpperLeft().getX()),
+                    (int) Math.round(this.rect.getUpperLeft().getY()),
+                    (int) Math.round(this.rect.getWidth()),
+                    (int) Math.round(this.rect.getHeight()));
+        }
     }
 
     /**
